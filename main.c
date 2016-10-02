@@ -2,30 +2,25 @@
 #include <string.h>
 #include <errno.h>
 #include <wiringSerial.h>
+#include <stdlib.h>
 
 int fd;
 
-<<<<<<< HEAD
-int countSubstr(char substr[5],char strtst[1000])
+int countSubstr(char substr[10],char strtst[1000])
 {
-    int len1,count,i,j;
-    char *p;
+    int count;
+    char *p=strtst;
 
-    len1=strlen(strtst);
-    p=substr;
-
-    while ((p = strstr(p, strtst)) != NULL && p != strtst)
+    while (p = strstr(p, substr))
     {
         count++;
-        p += len1;
+	p++;
     }
 
-    printf("Found %d occurrences of %s in %s\n", count, s1, s2);
+    printf("\nFound %d occurrences \n",count);
     return count;   
 }
 
-=======
->>>>>>> origin/master
 char* getstr(char* buff)
 {
     int i = 0;
@@ -54,7 +49,7 @@ char* getstr(char* buff)
     }
     buff[j] = 0;
 
-    printf("%s \n", buff); //debug
+    printf("\n%s\n", buff); //debug
 
     return(buff);
 }
@@ -79,14 +74,45 @@ serialPuts (fd,"AT+DISI?"); //serve para acordar o modulo
 getstr(check);
 delay(500);
 getstr(check);
+int QtdDisp=countSubstr("OK+DISC:",check);
+printf("\nTamanho total: %d\n",strlen(check));
 serialFlush (fd) ;
-printf("go\n");
+
+int  Rssi[QtdDisp], MeasPower[QtdDisp];
+char MacAdr[QtdDisp][15];
+char Rssi_char[QtdDisp][6];
+char *p; 
+char  MeasPower_char[QtdDisp][5];
+int cnt;
+
+for(cnt=0;cnt<QtdDisp;cnt++)
+{
+	p=check;
+	p=p+58+(cnt*78);
+	strncpy(MeasPower_char[cnt],p,2);
+	MeasPower_char[cnt][2]='\0';
+	p=p+3;
+	strncpy(MacAdr[cnt],p,12);
+	MacAdr[cnt][13]='\0';
+	p=p+14;
+	strncpy(Rssi_char[cnt],p,4);
+	Rssi_char[cnt][3]='\0';
+}
+
+//for(cnt=0;cnt<QtdDisp;cnt++)
+	//printf("\nMAC: %s Meas.Power: %s RSSI: %s",MacAdr[cnt],MeasPower_char[cnt],Rssi_char[cnt]);
+
+for(cnt=0;cnt<QtdDisp;cnt++)
+{
+	MeasPower[cnt]=strtol(MeasPower_char[cnt],&p,16);
+	//printf("\nMeas Power Decimal %d",MeasPower[cnt]);
+	Rssi[cnt]=atoi(Rssi_char[cnt])*-1;
+	//printf("\nRSSI %d",Rssi[cnt]);
+}
+
+for(cnt=0;cnt<QtdDisp;cnt++)
+	printf("\nMAC: %s Meas.Power: %d RSSI: %d",MacAdr[cnt],MeasPower[cnt],Rssi[cnt]);
 
 
-//fim do bloco que copia os dados para a string check
-  
-<<<<<<< HEAD
-}  
-=======
-}  
->>>>>>> origin/master
+printf("\n");
+}
