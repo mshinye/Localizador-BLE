@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <wiringSerial.h>
 #include <stdlib.h>
+#include "distance_rssi.h"
 
 int fd;
 
@@ -17,7 +18,7 @@ int countSubstr(char substr[10],char strtst[1000])
 	p++;
     }
 
-    printf("\nFound %d occurrences \n",count);
+   // printf("\nFound %d occurrences \n",count);
     return count;   
 }
 
@@ -75,7 +76,7 @@ getstr(check);
 delay(500);
 getstr(check);
 int QtdDisp=countSubstr("OK+DISC:",check);
-printf("\nTamanho total: %d\n",strlen(check));
+//printf("\nTamanho total: %d\n",strlen(check));
 serialFlush (fd) ;
 
 int  Rssi[QtdDisp], MeasPower[QtdDisp];
@@ -84,6 +85,7 @@ char Rssi_char[QtdDisp][6];
 char *p; 
 char  MeasPower_char[QtdDisp][5];
 int cnt;
+double Dist[QtdDisp];
 
 for(cnt=0;cnt<QtdDisp;cnt++)
 {
@@ -108,10 +110,12 @@ for(cnt=0;cnt<QtdDisp;cnt++)
 	//printf("\nMeas Power Decimal %d",MeasPower[cnt]);
 	Rssi[cnt]=atoi(Rssi_char[cnt])*-1;
 	//printf("\nRSSI %d",Rssi[cnt]);
+	Dist[cnt]=getDistance_RSSI(Rssi[cnt],(MeasPower[cnt]-256));
 }
 
+
 for(cnt=0;cnt<QtdDisp;cnt++)
-	printf("\nMAC: %s Meas.Power: %d RSSI: %d",MacAdr[cnt],MeasPower[cnt],Rssi[cnt]);
+	printf("\nMAC: %s Meas.Power: %d RSSI: %d Distancia: %lf",MacAdr[cnt],MeasPower[cnt],Rssi[cnt],Dist[cnt]);
 
 
 printf("\n");

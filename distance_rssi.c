@@ -4,7 +4,10 @@
 
   distance = 10^-(RSSI + A)/(10 * n)
 */
+#include "distance_rssi.h"
+#include <math.h>
+
 double getDistance_RSSI(double rssi, double a) {
 
-    return pow(10, (-rssi - a) / (10 * 2));
+    return pow(10, (a-rssi) / (10 * 2));
 }
