@@ -5,6 +5,7 @@
 
 int fd;
 
+<<<<<<< HEAD
 int countSubstr(char substr[5],char strtst[1000])
 {
     int len1,count,i,j;
@@ -23,6 +24,8 @@ int countSubstr(char substr[5],char strtst[1000])
     return count;   
 }
 
+=======
+>>>>>>> origin/master
 char* getstr(char* buff)
 {
     int i = 0;
@@ -82,4 +85,8 @@ printf("go\n");
 
 //fim do bloco que copia os dados para a string check
   
+<<<<<<< HEAD
 }  
+=======
+}  
+>>>>>>> origin/master
