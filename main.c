@@ -4,6 +4,8 @@
 #include <wiringSerial.h>
 #include <stdlib.h>
 #include "distance_rssi.h"
+#include <mysql/mysql.h>
+#include <time.h>
 
 int fd;
 
@@ -54,9 +56,7 @@ char* getstr(char* buff)
 
     return(buff);
 }
-
-
-int main ()
+int  insert_update()
 {
 	int b = 0;
 	int a = 0;
@@ -111,12 +111,71 @@ for(cnt=0;cnt<QtdDisp;cnt++)
 	Rssi[cnt]=atoi(Rssi_char[cnt])*-1;
 	//printf("\nRSSI %d",Rssi[cnt]);
 	Dist[cnt]=getDistance_RSSI(Rssi[cnt],(MeasPower[cnt]-256));
+	//Dist[cnt]=getDistance_RSSI(Rssi[cnt],-59);
 }
 
 
 for(cnt=0;cnt<QtdDisp;cnt++)
 	printf("\nMAC: %s Meas.Power: %d RSSI: %d Distancia: %lf",MacAdr[cnt],MeasPower[cnt],Rssi[cnt],Dist[cnt]);
 
+MYSQL con;
+mysql_init(&con);
+
+if(mysql_real_connect(&con,"192.168.0.16","root","admin","LOCBLE",0,NULL,0)) {
+	printf("\nConectado com sucesso!\n");
+ } 
+else
+{
+	printf("\nConexao falhou!\n");
+}
+
+time_t t = time(NULL);
+struct tm tm = *localtime(&t);
+char datetime[30];
+char test[30];
+
+sprintf(datetime,"%d",tm.tm_year+1900);
+strcat(datetime,"-");
+sprintf(test,"%d",(tm.tm_mon+1));
+strcat(datetime,test);
+sprintf(test,"%d",tm.tm_mday);
+strcat(datetime,"-");
+strcat(datetime,test);
+sprintf(test,"%d",tm.tm_hour);
+strcat(datetime," ");
+strcat(datetime,test);
+sprintf(test,"%d",tm.tm_min);
+strcat(datetime,":");
+strcat(datetime,test);
+sprintf(test,"%d",tm.tm_sec);
+strcat(datetime,":");
+strcat(datetime,test);
+
+char deviceid='1';
+
+char query[300];
+
+for(cnt=0;cnt<QtdDisp;cnt++)
+{
+	if(strcmp("88C25532CF72",MacAdr[cnt])==0 || strcmp("0CF3EE031CB2",MacAdr[cnt])==0)
+	sprintf(query,"INSERT INTO LOG VALUES (\"%s\",%c,\"%s\",%f)",datetime,deviceid,MacAdr[cnt],Dist[cnt]);
+	if(mysql_query(&con,query))
+	{
+		printf("Erro! %s",mysql_error(&con));
+	}
+}
+
+mysql_close(&con);
 
 printf("\n");
+}
+
+int main()
+{
+	while(1)
+	{
+		insert_update();
+		delay(2000);
+	}
+	
 }
