@@ -1,15 +1,15 @@
-/*RSSI = -10 * n * log(distance) - A
-  n ranges from 2 to 4
-  A is the RSSI value equivalent of distance of 1 meter between transmitter and receiver
-
-  distance = 10^-(RSSI + A)/(10 * n)
-  */
 #include "distance_rssi.h"
 #include <math.h>
 
-double getDistance_RSSI(double rssi, double a) {
+/*
+ *  @desc   Estima a distancia entre Bluetooth e Scan Bluetooth por regressao exponencial
+ *  @param  rssi: Valor de RSSI em dB; measPower: Valor de Transmissao de Energia(dB) usado para calculo de Distancia
+ *  @return Valor Estimado
+ */
 
-    double ratio = rssi*1.0/a;
+double getDistance_RSSI(double rssi, double measPower) {
+
+    double ratio = rssi*1.0/measPower;
     if (ratio < 1.0) {
         return pow(ratio,10);
     }
